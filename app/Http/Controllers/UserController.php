@@ -14,12 +14,17 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $user = User::Where('email', $request->email)->first();
-        if (!$user || $request->password != $user->password) {
-            return 'Error';
+        if (!$user) {
+            return Response::json('User not exist', 404);
         } else {
-            $token = $user->createToken('token')->plainTextToken;
-            $user->token = $token;
-            return Response::json($user);
+            if ($request->email == $user->email && $request->password == $user->password) {
+                $token = $user->createToken('token')->plainTextToken;
+                $user->token = $token;
+                return Response::json($user);
+            }
+            else {
+                return Response::json('Error', 404);
+            }
         }
     }
 }
